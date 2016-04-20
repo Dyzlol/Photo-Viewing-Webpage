@@ -1,0 +1,144 @@
+<!doctype html>
+
+<html>
+    <head>
+        <meta charset = "UTF-8" />
+        <title>Photo Viewer</title>
+        <style>
+            body{background: #FFF1CC;}
+            img{border-style: solid;}
+        </style>
+    </head>
+
+    <body>
+        <h1><u>Viewer</u></h1>
+
+        <!-- set up form for input -->
+        <form>
+            <img id="myImage" src="InitialImage.jpg" width = "550" height = "400" onclick="nextSlide()" alt="image"/>
+              <p>
+                Photos Folder:
+                <input type="text" id="folderName" value="umcp/" size="65"/><br/><br/>
+                Common Name:
+                <input type="text" id="commonName" value="college" size="40"/><br/><br/>
+                Start Photo Number:
+                <input type="text" id="start_valVal" value="1"/>
+                End Photo Number:
+                <input type="text" id="end_valVal" value="1"/><br/><br/>
+                <!-- buttons -->
+                <input type="button" id="slide_show" value="Slide Show" onclick="getArrayPhotosNames()"/>
+                <input type="button" id="rand_slide_show" value="Random Slide Show" onclick="randomize()"/>
+                <input type="button" id="prev_slide" value="Previous Slide" onclick="prevSlide()"/>
+                <input type="button" id="next_slide" value="Next Slide" onclick="nextSlide()"/><br/><br/>
+                <input type="button" id="auto_slide_show" value= "Auto Slide Show" onclick="autoSlideshow()"/>
+                <input type="button" id="auto_rand_slide_show" value="Auto Random Slide Show" onclick="randSlideshow()"/>
+                <input type="button" id="stop_slide_show" value="Stop Auto Show" onclick="stopSlideshow()"/><br/><br/>
+                <input type="reset" name="Reset" onclick="window.location.reload()"/>
+              </p>
+        </form>
+
+
+        <script>
+            // script globals
+            var image_array = new Array();
+            var pos, start_val_val, end_val_val, size;
+
+            function getArrayPhotosNames(){
+              // set variables for use
+              var folder_ID = document.getElementById("folderName");
+              var folder = folder_ID.getAttribute("value");
+              var common_ID = document.getElementById("commonName");
+              var common_name = common_ID.getAttribute("value");
+              var temp_image_array = new Array();
+
+              if((start_val = Number(document.getElementById("start_valVal").value)) > (end_val = Number(document.getElementById("end_valVal").value)))
+                  alert("Invalid Range"); // check for proper range
+              else {
+                // fill array in order
+                var index = 0;
+                var counter = start_val;
+                while (counter <= end_val) {
+                  var photo_loc = folder + common_name + counter + ".jpg";
+                  temp_image_array[index++] = photo_loc;
+                  counter++;
+                }
+                // assign final values and updatePhoto
+                image_array = temp_image_array;
+                pos = 0;
+                size = image_array.length;
+                updatePhoto();
+                }
+            }
+
+            function randomize(){
+              // set variables for use !Dont forget to ask Nelson why
+              var folder_ID = document.getElementById("folderName");
+              var folder = folder_ID.getAttribute("value");
+              var common_ID = document.getElementById("commonName");
+              var common_name = common_ID.getAttribute("value");
+              var temp_image_array = new Array();
+
+              // check for proper values by setting start/end
+              if((start_val = Number(document.getElementById("start_valVal").value)) > (end_val = Number(document.getElementById("end_valVal").value)))
+                  alert("Invalid Range");
+              else { // if proper values for start/end fill image array
+                var index = 0;
+                var counter = start_val;
+                while (counter <= end_val) {
+                    var photo_loc = folder + common_name + counter + ".jpg";
+                    temp_image_array[index++] = photo_loc;
+                    counter++;
+                }
+
+                // begin randomizing array with swap method
+                var counter = temp_image_array.length;
+                var rand_num, tempValue;
+                while (0 !== counter) {
+                  rand_num = Math.floor(Math.random() * counter);
+                  counter--;
+                  tempValue = temp_image_array[counter];
+                  temp_image_array[counter] = temp_image_array[rand_num];
+                  temp_image_array[rand_num] = tempValue;
+                }
+              }
+              // assign final values and call updatePhoto
+              image_array = temp_image_array;
+              pos = 0;
+              size = image_array.length;
+              updatePhoto();
+            }
+
+            function updatePhoto(){
+              // get Id and set attribute to new image
+              document.getElementById("myImage").setAttribute("src", image_array[pos]);
+            }
+
+            function nextSlide(){
+              // check for rollover from array bounds then call updatePhoto
+              pos = (pos + 1 < size) ? pos + 1 : 0;
+              updatePhoto();
+            }
+
+            function prevSlide(){
+              // check for rollover from array bounds then call updatePhoto
+              pos = (pos - 1 >= 0) ? pos - 1 : size - 1;
+              updatePhoto();
+            }
+
+            function randSlideshow(){
+              randomize(); // randomize then set interval
+              loop_time = setInterval("nextSlide()",1000);
+            }
+
+            function autoSlideshow(){
+              getArrayPhotosNames(); // non-random fill array then set interval
+              loop_time = setInterval("nextSlide()",1000);
+            }
+
+            function stopSlideshow(){
+              clearInterval(loop_time); // clears any Interval running with var 'loop_time'
+            }
+
+        </script>
+    </body>
+</html>
